@@ -18,13 +18,12 @@ export default function Content() {
     const [alert, setAlert] = useState({show:false, msg:'', type:''})
     const [name, setName] = useState('')
     const [isEditing, setIsEditing] = useState(false)
-    const [oldID, setOldID] = useState(null)
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e, id) => {
         e.preventDefault();
         if (!name) {
             showAlert(true, 'danger', 'please enter value')
-        } else if (alert && isEditing) {
+        }  else if (alert && isEditing) {
             setList(
                 list.map((item) => {
                     if (item.id === editID) {
@@ -39,13 +38,16 @@ export default function Content() {
             showAlert(true, 'success', 'value changed')
         }   else {
             showAlert(true, 'success', 'new item added!')
-            const newItem = ({ id: new Date().getTime().toString(), title: name})
-            const listB = Object.values(newItem)
-            const listA = Object.values(list[0])
-            console.log(listB.includes(newItem.title) && listA.includes(newItem.title))
-            setList([...list, newItem])
-            setName('')
-            setIsEditing(false)
+            const newItem = ({ id: id, title: name})
+            const isItemExist = list.filter(i => i.id === newItem.id).length
+            if (isItemExist) {
+                showAlert(true, 'danger', 'value already exists')
+                return
+            } else {
+                setList([...list, newItem])
+                setName('')
+                setIsEditing(false)
+            }
     }
 }
     const showAlert = (show = 'false', type="", msg="") => {
@@ -67,6 +69,7 @@ export default function Content() {
     }
     useEffect(() => {
         localStorage.setItem('list', JSON.stringify(list))  
+        console.log(list);
     }, [list])  
 
     return(
